@@ -71,6 +71,13 @@ function M.work(settings)
     end
 
     M.print_script_settings()
+
+    if M.TARGET_SOURCE == "" or M.TARGET_SOURCE == nil then
+        print("ERROR: No target source set")
+        obs.timer_remove(M.timer_callback)
+        return
+    end
+
     M.update_timer()
     -- Update text right away
     M.update_text_source_with_cmd_output()
