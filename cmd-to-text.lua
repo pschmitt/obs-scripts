@@ -3,92 +3,97 @@ local obs = obslua
 
 local utils = require 'utils'
 
+local M = {}
+
 -- Define defaults
-local DEFAULT_INTERVAL = 30
-local DEFAULT_TIMEOUT = 5
-local DEFAULT_COMMAND = 'date'
-local DEFAULT_SHELL = 'sh'
+M.DEFAULT_INTERVAL = 30
+M.DEFAULT_TIMEOUT = 5
+M.DEFAULT_COMMAND = 'date'
+M.DEFAULT_SHELL = 'sh'
 
 -- Internal vars (current settings)
-local INTERVAL = DEFAULT_INTERVAL
-local TIMEOUT = DEFAULT_TIMEOUT
-local SHELL = DEFAULT_SHELL
-local COMMAND = DEFAULT_COMMAND
-local TARGET_SOURCE = ""
-local DEBUG = false
+M.INTERVAL = M.DEFAULT_INTERVAL
+M.TIMEOUT = M.DEFAULT_TIMEOUT
+M.SHELL = M.DEFAULT_SHELL
+M.COMMAND = M.DEFAULT_COMMAND
+M.TARGET_SOURCE = ""
+M.DEBUG = false
 
--- Function to execute a shell command and capture its output
-local function update_text_source_with_cmd_output()
-    local text = utils.exec_cmd(COMMAND, TIMEOUT, SHELL, DEBUG)
+function M.update_text_source_with_cmd_output()
+    local text = utils.exec_cmd(M.COMMAND, M.TIMEOUT, M.SHELL, M.DEBUG)
 
     if text == nil then
         print("ERROR: Command returned nil")
         return
     end
 
-    utils.update_text_source(TARGET_SOURCE, text)
+    utils.update_text_source(M.TARGET_SOURCE, text)
 end
 
 -- Timer callback function
-local function timer_callback()
-    update_text_source_with_cmd_output()
+function M.timer_callback()
+    M.update_text_source_with_cmd_output()
 end
 
 -- Function to update the timer based on the interval setting
-local function update_timer()
+function M.update_timer()
     -- Remove the existing timer
-    obs.timer_remove(timer_callback)
+    obs.timer_remove(M.timer_callback)
 
     -- Register the timer with the new interval
-    obs.timer_add(timer_callback, INTERVAL * 1000)
+    obs.timer_add(M.timer_callback, M.INTERVAL * 1000)
 end
 
-local function print_script_settings()
+function M.print_script_settings()
     print("Script settings:")
-    print(string.format("Interval: %ds", INTERVAL))
-    print(string.format("Command: %s", COMMAND))
-    print(string.format("Shell: %s", SHELL))
-    print(string.format("Timeout: %ds", TIMEOUT))
-    print(string.format("Target Source: %s", TARGET_SOURCE))
+    print(string.format("Interval: %ds", M.INTERVAL))
+    print(string.format("Command: %s", M.COMMAND))
+    print(string.format("Shell: %s", M.SHELL))
+    print(string.format("Timeout: %ds", M.TIMEOUT))
+    print(string.format("Target Source: %s", M.TARGET_SOURCE))
 end
 
-local function work(settings)
-    COMMAND = obs.obs_data_get_string(settings, 'command')
-    INTERVAL = obs.obs_data_get_int(settings, 'interval')
-    SHELL = obs.obs_data_get_string(settings, 'shell')
-    TARGET_SOURCE = obs.obs_data_get_string(settings, 'target_source')
-    TIMEOUT = obs.obs_data_get_int(settings, 'timeout')
+function M.work(settings)
+    M.COMMAND = obs.obs_data_get_string(settings, 'command')
+    M.INTERVAL = obs.obs_data_get_int(settings, 'interval')
+    M.SHELL = obs.obs_data_get_string(settings, 'shell')
+    M.TARGET_SOURCE = obs.obs_data_get_string(settings, 'target_source')
+    M.TIMEOUT = obs.obs_data_get_int(settings, 'timeout')
 
-    if INTERVAL == nil then
-        INTERVAL = DEFAULT_INTERVAL
+    if M.INTERVAL == nil then
+        M.INTERVAL = M.DEFAULT_INTERVAL
     end
 
-    if TIMEOUT == nil then
-        TIMEOUT = DEFAULT_TIMEOUT
+    if M.TIMEOUT == nil then
+        M.TIMEOUT = M.DEFAULT_TIMEOUT
     end
 
-    print_script_settings()
-    update_timer()
+    M.print_script_settings()
+    M.update_timer()
     -- Update text right away
-    update_text_source_with_cmd_output()
+    M.update_text_source_with_cmd_output()
 end
 
 ---@diagnostic disable-next-line lowercase-global
 function script_load(settings)
-    work(settings)
+    M.work(settings)
 end
 
 ---@diagnostic disable-next-line lowercase-global
 function script_update(settings)
-    work(settings)
+    M.work(settings)
+end
+
+function M.script_defaults(settings)
+    obs.obs_data_set_default_int(settings, 'interval', M.DEFAULT_INTERVAL)
+    obs.obs_data_set_default_int(settings, 'timeout', M.DEFAULT_TIMEOUT)
+    obs.obs_data_set_default_string(settings, 'command', M.DEFAULT_COMMAND)
+    obs.obs_data_set_default_string(settings, 'shell', M.DEFAULT_SHELL)
 end
 
 ---@diagnostic disable-next-line lowercase-global
 function script_defaults(settings)
-    obs.obs_data_set_default_int(settings, 'interval', DEFAULT_INTERVAL)
-    obs.obs_data_set_default_int(settings, 'timeout', DEFAULT_TIMEOUT)
-    obs.obs_data_set_default_string(settings, 'command', DEFAULT_COMMAND)
-    obs.obs_data_set_default_string(settings, 'shell', DEFAULT_SHELL)
+    M.script_defaults(settings)
 end
 
 ---@diagnostic disable-next-line lowercase-global
@@ -96,15 +101,66 @@ function script_description()
     return "🤖 Execute a command periodically and update a text source with the output."
 end
 
----@diagnostic disable-next-line lowercase-global
-function script_properties()
-    return utils.cmd_script_properties()
+function M.script_properties()
+    local props = obs.obs_properties_create()
+    obs.obs_properties_add_int(
+        props,
+        "interval",
+        "Interval (s)",
+        1,
+        7200,
+        1
+    )
+    obs.obs_properties_add_text(
+        props,
+        "command",
+        "Command",
+        obs.OBS_TEXT_DEFAULT
+    )
+
+    obs.obs_properties_add_text(
+        props,
+        "shell",
+        "Shell",
+        obs.OBS_TEXT_DEFAULT
+    )
+
+    obs.obs_properties_add_int(
+        props,
+        "timeout",
+        "Timeout (s)",
+        1,
+        3600,
+        1
+    )
+
+    local sources = obs.obs_properties_add_list(
+        props, 'target_source', 'Source:',
+        obs.OBS_COMBO_TYPE_EDITABLE,
+        obs.OBS_COMBO_FORMAT_STRING)
+
+    local txt_sources = utils.get_text_sources()
+    for _, name in ipairs(txt_sources) do
+        obs.obs_property_list_add_string(sources, name, name)
+    end
+
+    return props
 end
 
--- Script Hook - Called when the script is unloaded
+---@diagnostic disable-next-line lowercase-global
+function script_properties()
+    return M.script_properties()
+end
+
+function M.script_unload()
+    obs.timer_remove(M.timer_callback)
+end
+
 ---@diagnostic disable-next-line lowercase-global
 function script_unload()
-    obs.timer_remove(timer_callback)
+    M.script_unload()
 end
+
+return M
 
 -- vim set ft=lua et ts=4 sw=4 :
