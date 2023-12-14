@@ -35,6 +35,13 @@ Parameters:
 
   - `interval`, `timeout`, `command`, `shell`, `target_source`: Similar to `cmd-to-text.lua`.
 
+## 🏐 `bounce.lua`
+
+This my fork of [obs-bounce](https://github.com/insin/obs-bounce), which brings
+a few quality-of-life improvements.
+
+See [the PR](https://github.com/insin/obs-bounce/pull/8) for more details.
+
 ## 🛠️ Installation
 
 1. Clone the repository to obtain all scripts, along with necessary

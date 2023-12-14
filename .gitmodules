@@ -1,0 +1,4 @@
+[submodule "obs-bounce"]
+	path = obs-bounce
+	url = https://github.com/pschmitt/obs-bounce.git
+	branch = follow-item-visibility
