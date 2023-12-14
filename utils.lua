@@ -115,7 +115,7 @@ function M.update_text_source(source_name, text, color_hex)
 
     local source = obs.obs_get_source_by_name(source_name)
     if source == nil then
-        print("Target source not found.")
+        print("ERROR: Target source not found.")
         return
     end
 
