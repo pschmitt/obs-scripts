@@ -1,8 +1,8 @@
 ---@diagnostic disable-next-line undefined-global
 local obs = obslua
 
-local utils = require 'utils'
 local cmdtxt = require 'cmd-to-text'
+local utils = require 'utils'
 
 -- Define defaults
 local DEFAULT_INTERVAL = 30
@@ -10,15 +10,20 @@ local DEFAULT_TIMEOUT = 5
 local DEFAULT_SHELL = "zsh"
 local DEFAULT_COMMAND = 'timewarrior::today-total --minutes'
 
+-- Apply the default to upstream
 cmdtxt.DEFAULT_INTERVAL = DEFAULT_INTERVAL
 cmdtxt.DEFAULT_TIMEOUT = DEFAULT_TIMEOUT
 cmdtxt.DEFAULT_SHELL = DEFAULT_SHELL
 cmdtxt.DEFAULT_COMMAND = DEFAULT_COMMAND
 cmdtxt.DEBUG = false
 
--- Function to execute a shell command and capture its output
 local function update_text_source_with_cmd_output()
-    local text = utils.exec_cmd(cmdtxt.COMMAND, cmdtxt.TIMEOUT, cmdtxt.SHELL, cmdtxt.DEBUG)
+    local text = utils.exec_cmd(
+        cmdtxt.COMMAND,
+        cmdtxt.TIMEOUT,
+        cmdtxt.SHELL,
+        cmdtxt.DEBUG
+    )
 
     if text == nil then
         print("ERROR: Command returned nil")
@@ -35,6 +40,8 @@ local function update_text_source_with_cmd_output()
             color = '#ff0000'
         elseif hours >= 7 then
             color = '#ff8000'
+        elseif hours >= 6 then
+            color = '#fff000'
         end
     end
 
