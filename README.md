@@ -1,4 +1,4 @@
-# 🎬 OBS Lua Scripts Collection by pschmitt 🌟
+# 🎬 OBS Scripts Collection by pschmitt 🌟
 
 Welcome to my collection of personal OBS Lua Scripts!
 
