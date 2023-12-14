@@ -8,11 +8,11 @@ function M.exec_cmd(command, timeout, shell, debug)
     shell = shell or "sh"
     debug = debug or false
 
+    command = string.format("timeout '%d' %s -c '%s'", timeout, shell, command)
+
     if debug then
         command = string.format('%s 2>&1', command)
     end
-
-    command = string.format("timeout '%d' %s -c '%s'", timeout, shell, command)
 
     local time = os.date("%H:%M:%S")
     print(string.format("[%s] Exec: %s", time, command))
