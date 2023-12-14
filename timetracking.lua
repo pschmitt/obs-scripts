@@ -105,22 +105,6 @@ function script_defaults(settings)
 end
 
 ---@diagnostic disable-next-line lowercase-global
-function script_update(settings)
-    INTERVAL = obs.obs_data_get_int(settings, 'interval')
-    COMMAND = obs.obs_data_get_string(settings, 'command')
-    TARGET_SOURCE = obs.obs_data_get_string(settings, 'target_source')
-
-    if INTERVAL == 0 then
-        INTERVAL = DEFAULT_INTERVAL
-    end
-
-    print_script_settings()
-    update_timer()
-    -- Update text right away
-    update_text_source_with_cmd_output()
-end
-
----@diagnostic disable-next-line lowercase-global
 function script_description()
     return "⏱️ Show timetracking info"
 end
