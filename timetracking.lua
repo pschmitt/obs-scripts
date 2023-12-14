@@ -4,17 +4,11 @@ local obs = obslua
 local cmdtxt = require 'cmd-to-text'
 local utils = require 'utils'
 
--- Define defaults
-local DEFAULT_INTERVAL = 30
-local DEFAULT_TIMEOUT = 5
-local DEFAULT_SHELL = "zsh"
-local DEFAULT_COMMAND = 'timewarrior::today-total --minutes'
+local description = "⏱️ Show timetracking info"
 
--- Apply the default to upstream
-cmdtxt.DEFAULT_INTERVAL = DEFAULT_INTERVAL
-cmdtxt.DEFAULT_TIMEOUT = DEFAULT_TIMEOUT
-cmdtxt.DEFAULT_SHELL = DEFAULT_SHELL
-cmdtxt.DEFAULT_COMMAND = DEFAULT_COMMAND
+-- Update default values
+cmdtxt.DEFAULT_SHELL = "zsh"
+cmdtxt.DEFAULT_COMMAND = 'timewarrior::today-total --minutes'
 cmdtxt.DEBUG = false
 
 local function update_text_source_with_cmd_output()
@@ -34,7 +28,7 @@ local function update_text_source_with_cmd_output()
     local hours = utils.extract_first_digit(text)
 
     if hours ~= nil then
-        print("Hours: " .. hours)
+        print(string.format("Hours: %d", hours))
 
         if hours >= 8 then
             color = '#ff0000'
@@ -45,6 +39,7 @@ local function update_text_source_with_cmd_output()
         end
     end
 
+    -- prepend emoji
     text = string.format("⏱️ %s", text)
     utils.update_text_source(cmdtxt.TARGET_SOURCE, text, color)
 end
@@ -69,7 +64,7 @@ end
 
 ---@diagnostic disable-next-line lowercase-global
 function script_description()
-    return "⏱️ Show timetracking info"
+    return description
 end
 
 ---@diagnostic disable-next-line lowercase-global
