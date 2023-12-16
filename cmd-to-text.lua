@@ -62,7 +62,7 @@ function M.work(settings)
     M.SHELL = obs.obs_data_get_string(settings, 'shell')
     M.TARGET_SOURCE = obs.obs_data_get_string(settings, 'target_source')
     M.TIMEOUT = obs.obs_data_get_int(settings, 'timeout')
-    M.DEBUG = obs.obs_data_get_int(settings, 'debug')
+    M.DEBUG = obs.obs_data_get_bool(settings, 'debug')
 
     if M.INTERVAL == nil then
         M.INTERVAL = M.DEFAULT_INTERVAL
