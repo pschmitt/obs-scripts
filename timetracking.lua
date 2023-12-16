@@ -4,11 +4,15 @@ local obs = obslua
 local cmdtxt = require 'cmd-to-text'
 local utils = require 'utils'
 
-local description = "⏱️ Show timetracking info"
+local DESCRIPTION = "⏱️ Show timetracking info"
+local DEFAULT_VALUE= "N/A"
 
 -- Update default values
 cmdtxt.DEFAULT_SHELL = "zsh"
-cmdtxt.DEFAULT_COMMAND = 'timewarrior::today-total --minutes || echo N/A'
+cmdtxt.DEFAULT_COMMAND = string.format(
+    "timewarrior::today-total --minutes || echo '%s'",
+    DEFAULT_VALUE
+)
 
 local function update_text_source_with_cmd_output()
     local text = utils.exec_cmd(
@@ -18,9 +22,12 @@ local function update_text_source_with_cmd_output()
         cmdtxt.DEBUG
     )
 
-    if text == nil then
-        print("ERROR: Command returned nil")
-        return
+    if text == nil or text == "" then
+        print(string.format(
+            "ERROR: Command returned no output. Defaulting to %s",
+            DEFAULT_VALUE)
+        )
+        text = DEFAULT_VALUE
     end
 
     local color = '#ffffff'
@@ -65,7 +72,7 @@ end
 
 ---@diagnostic disable-next-line lowercase-global
 function script_description()
-    return description
+    return DESCRIPTION
 end
 
 ---@diagnostic disable-next-line lowercase-global

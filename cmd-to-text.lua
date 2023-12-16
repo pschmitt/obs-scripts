@@ -5,7 +5,7 @@ local utils = require 'utils'
 
 local M = {}
 
-local description = "🤖 Execute a command <b>periodically</b> and update a text source with the output."
+local DESCRIPTION = "🤖 Execute a command <b>periodically</b> and update a text source with the output."
 
 -- Define defaults
 M.DEFAULT_INTERVAL = 30
@@ -109,7 +109,7 @@ end
 
 ---@diagnostic disable-next-line lowercase-global
 function script_description()
-    return description
+    return DESCRIPTION
 end
 
 function M.script_properties()
