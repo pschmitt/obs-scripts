@@ -12,6 +12,7 @@ M.DEFAULT_INTERVAL = 30
 M.DEFAULT_TIMEOUT = 5
 M.DEFAULT_COMMAND = 'date'
 M.DEFAULT_SHELL = 'sh'
+M.DEFAULT_DEBUG = false
 
 -- Internal vars (current settings)
 M.INTERVAL = M.DEFAULT_INTERVAL
@@ -19,7 +20,7 @@ M.TIMEOUT = M.DEFAULT_TIMEOUT
 M.SHELL = M.DEFAULT_SHELL
 M.COMMAND = M.DEFAULT_COMMAND
 M.TARGET_SOURCE = ""
-M.DEBUG = false
+M.DEBUG = M.DEFAULT_DEBUG
 
 function M.update_text_source_with_cmd_output()
     local text = utils.exec_cmd(M.COMMAND, M.TIMEOUT, M.SHELL, M.DEBUG)
@@ -98,6 +99,7 @@ function M.script_defaults(settings)
     obs.obs_data_set_default_int(settings, 'timeout', M.DEFAULT_TIMEOUT)
     obs.obs_data_set_default_string(settings, 'command', M.DEFAULT_COMMAND)
     obs.obs_data_set_default_string(settings, 'shell', M.DEFAULT_SHELL)
+    obs.obs_data_set_default_bool(settings, 'debug', M.DEFAULT_DEBUG)
 end
 
 ---@diagnostic disable-next-line lowercase-global
@@ -152,6 +154,12 @@ function M.script_properties()
     for _, name in ipairs(txt_sources) do
         obs.obs_property_list_add_string(sources, name, name)
     end
+
+    obs.obs_properties_add_bool(
+        props,
+        "debug",
+        "Debug"
+    )
 
     return props
 end

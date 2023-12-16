@@ -8,8 +8,7 @@ local description = "⏱️ Show timetracking info"
 
 -- Update default values
 cmdtxt.DEFAULT_SHELL = "zsh"
-cmdtxt.DEFAULT_COMMAND = 'timewarrior::today-total --minutes'
-cmdtxt.DEBUG = false
+cmdtxt.DEFAULT_COMMAND = 'timewarrior::today-total --minutes || echo N/A'
 
 local function update_text_source_with_cmd_output()
     local text = utils.exec_cmd(
@@ -27,7 +26,9 @@ local function update_text_source_with_cmd_output()
     local color = '#ffffff'
     local hours = utils.extract_first_digit(text)
 
-    if hours ~= nil then
+    local valid = (hours ~= nil)
+
+    if valid then
         print(string.format("Hours: %d", hours))
 
         if hours >= 8 then
