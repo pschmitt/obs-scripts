@@ -73,13 +73,15 @@ function M.extract_first_digit(str)
     return tonumber(first_part)
 end
 
-local OBS_TXT_SOURCE_PTHREAD = "obs_text_pthread_source_v2"
 local OBS_TXT_SOURCE_FREETYPE2 = "text_ft2_source_v2"
+local OBS_TXT_SOURCE_PANGO = "text_pango_source"
+local OBS_TXT_SOURCE_PTHREAD = "obs_text_pthread_source_v2"
 
 function M.is_text_source(source_id)
     local allowed_source_types = {
-        OBS_TXT_SOURCE_PTHREAD,
-        OBS_TXT_SOURCE_FREETYPE2
+        OBS_TXT_SOURCE_FREETYPE2,
+        OBS_TXT_SOURCE_PANGO,
+        OBS_TXT_SOURCE_PTHREAD
     }
     for _, allowed_id in ipairs(allowed_source_types) do
         if source_id == allowed_id then
@@ -129,13 +131,23 @@ function M.update_text_source(source_name, text, color_hex)
 
     if color_hex ~= nil then
         local color_int = M.convertHexToOBSColor(color_hex)
-        if color_int ~= nil then
-            local previous_color = obs.obs_data_get_int(source_settings, "color")
-            local previous_color_hex = M.convertOBSColorToHex(previous_color)
+        if color_int == nil then
+            print(string.format("ERROR: Invalid color: %s", color_hex))
+        else
+            local color_props = { "color1", "color2" }
+            local source_id = obs.obs_source_get_id(source)
+            -- obs-text-pthread only has a single color property
+            if source_id == OBS_TXT_SOURCE_PTHREAD then
+                color_props = { "color" }
+            end
 
-            if color_int ~= previous_color then
-                print(string.format("Color: %s -> %s", previous_color_hex, color_hex))
-                obs.obs_data_set_int(source_settings, "color", color_int)
+            for _, prop in ipairs(color_props) do
+                local previous_color = obs.obs_data_get_int(source_settings, prop)
+                local previous_color_hex = M.convertOBSColorToHex(previous_color)
+                if color_int ~= previous_color then
+                    print(string.format("Color: %s -> %s", previous_color_hex, color_hex))
+                    obs.obs_data_set_int(source_settings, prop, color_int)
+                end
             end
         end
     end
